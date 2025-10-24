@@ -19,29 +19,28 @@ class Login extends Component
 
     public function save()
     {
+        try {
+            $this->validate();
 
-        $this->validate();
+            // Cari user berdasarkan username
+            $user = User::where('username', $this->username)->first();
 
-        // Cari user berdasarkan username
-        $user = User::where('username', $this->username)->first();
-
-        if (!$user || !Hash::check($this->password, $user->password)) {
-            // Jika gagal login
-            session()->flash('error', 'Invalid username or password.');
-            return;
+            if (!$user || !Hash::check($this->password, $user->password)) {
+                // Jika gagal login
+                session()->flash('error', 'Invalid username or password.');
+                return;
+            }
+            Auth::login($user);
+            session()->regenerate();
+            // Beri pesan sukses
+            session()->flash('success', 'Welcome back, ' . $user->username . '!');
+            return redirect()->to('/home');
+        } catch (\Throwable $th) {
+            return redirect()->back();
         }
 
-        // Login user
-        Auth::login($user);
 
-        // Optional: regenerate session untuk keamanan
-        session()->regenerate();
 
-        // Beri pesan sukses
-        session()->flash('success', 'Welcome back, ' . $user->username . '!');
-
-        // Redirect ke halaman home
-        return redirect()->to('/home');
     }
 
     public function render()

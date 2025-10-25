@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -31,6 +32,18 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'username' => 'attar',
             'password' => Hash::make('attar123'),
+        ]);
+
+        Message::create([
+            'sender_id' => 1,
+            'receiver_id' => 2,
+            'message' => 'halo'
+        ]);
+
+        Message::create([
+            'sender_id' => 2,
+            'receiver_id' => 1,
+            'message' => 'halo'
         ]);
     }
 }

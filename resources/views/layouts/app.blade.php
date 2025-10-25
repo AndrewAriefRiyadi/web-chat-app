@@ -17,9 +17,9 @@
 <body data-theme="forest"
     class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-white flex p-6 lg:p-8 items-center justify-center min-h-screen flex-col font-mono">
     <div
-        class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
-        <main class="flex  w-full flex-col-reverse lg:max-w-4xl">
-            <div class="flex flex-col bg-white/10 w-full p-8 rounded-2xl">
+        class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0 h-full">
+        <main class="flex  w-full flex-col-reverse lg:max-w-4xl h-full">
+            <div class="flex flex-col bg-white/10 w-full p-8 rounded-2xl h-full">
                 @yield('content')
             </div>
         </main>

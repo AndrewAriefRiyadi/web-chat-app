@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Message;
+use App\Models\User;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,15 +13,43 @@ class UserList extends Component
 
     public $current_messages = [];
 
+    public $error_message = '';
+
     public $input_message = '';
 
     public $current_partner_id = '';
 
-    public function mount(){
+    public function mount()
+    {
         $this->reset('current_messages');
     }
 
-    public function sent_message(){
+    public function start_new_chat()
+    {
+        $this->error_message = '';
+        $username = $this->search;
+
+        if ($username === '') {
+            return;
+        }
+        $user = User::where('username', $username)->first();
+        if (!$user) {
+            $this->error_message = "Username not found.";
+            return;
+        }
+
+        $new_message = Message::create([
+            'sender_id' => Auth::id(),
+            'receiver_id' => $user->id,
+            'message' => 'Halo',
+        ]);
+
+        $this->show_chat($user->id);
+        $this->render();
+    }
+
+    public function sent_message()
+    {
         if ($this->input_message == '') {
             return;
         }
@@ -54,7 +83,7 @@ class UserList extends Component
             })
             ->get()
             ->sort();
-            
+
     }
 
 
@@ -62,13 +91,26 @@ class UserList extends Component
     {
 
         return view('livewire.user-list', [
-            'chats' => Message::with('sender')
-                ->where('receiver_id', Auth::id())
-                ->whereHas('sender', fn($q) => $q->where('username', 'like', "%{$this->search}%"))
+            'chats' => Message::with(['sender', 'receiver'])
+                ->where(function ($q) {
+                    $q->where('receiver_id', Auth::id())
+                        ->whereHas(
+                            'sender',
+                            fn($q) =>
+                            $q->where('username', 'like', "%{$this->search}%")
+                        );
+                })
+                ->orWhere(function ($q) {
+                    $q->where('sender_id', Auth::id())
+                        ->whereHas(
+                            'receiver',
+                            fn($q) =>
+                            $q->where('username', 'like', "%{$this->search}%")
+                        );
+                })
+                ->orderBy('created_at')
                 ->get()
-                ->groupBy('sender_id'),
-            'current_messages' => $this->current_messages,
-            'input_message' => $this->input_message,
+                ->groupBy(fn($msg) => $msg->sender_id == Auth::id() ? $msg->receiver_id : $msg->sender_id),
         ]);
 
     }

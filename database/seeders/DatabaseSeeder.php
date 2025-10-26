@@ -34,6 +34,11 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('attar123'),
         ]);
 
+        User::factory()->create([
+            'username' => 'patel',
+            'password' => Hash::make('patel123'),
+        ]);
+
         Message::create([
             'sender_id' => 1,
             'receiver_id' => 2,

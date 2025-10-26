@@ -6,23 +6,45 @@
                 <input wire:model.live="search" type="text" placeholder="username.."
                     class=" bg-white/10 p-2   text-xs rounded placeholder:text-white/50 focus:outline-2 outline-1 outline-white/30 ">
                 @if ($chats->isEmpty())
-                    <button class=" bg-accent/30 text-xs px-1  rounded py-2">Start new chat</button>
+                    <button wire:click="start_new_chat"
+                        class=" bg-accent/30 text-xs px-1  rounded py-2 hover:bg-accent/50 focus:outline focus:outline-white/30">Start
+                        new chat</button>
+                @endif
+                @if ($error_message)
+                    <p class=" text-xs text-red-500">{{ $error_message }}</p>
                 @endif
 
             </div>
             <div class="flex flex-col gap-2 w-full ">
                 @if ($chats)
-                    @foreach ($chats as $senderId => $messages)
-                        {{-- Ambil pesan pertama untuk dapat info sender --}}
-                        @php $lastMessage = $messages->last(); @endphp
-                        <button type="button" wire:click="show_chat({{ $senderId }})"
-                            class=" text-start px-2 py-1 bg-primary/30 rounded w-full transition transform hover:translate-x-1 focus:translate-x-1.5
-                            focus:bg-secondary/30 focus:outline-2 focus:outline-white/30">
-                            <p class=" text-accent font-bold text-lg">{{ $lastMessage->sender->username }}</p>
-                            <p class=" text-xs text-white/70 truncate">{{ $lastMessage->message }}</p>
+                    @foreach ($chats as $partnerId => $messages)
+                        @php
+                            // Ambil pesan terakhir untuk preview
+                            $lastMessage = $messages->last();
+                            // Tentukan user lawan bicara (bisa sender atau receiver)
+                            $partner =
+                                $lastMessage->sender_id == Auth::id() ? $lastMessage->receiver : $lastMessage->sender;
+
+                            
+                        @endphp
+
+                        <button type="button" wire:click="show_chat({{ $partner->id }})"
+                            class="text-start px-2 py-1 bg-primary/30 rounded w-full 
+                                    transition transform hover:translate-x-1 
+                                    focus:translate-x-1.5 focus:bg-secondary/30 
+                                    focus:outline-2 focus:outline-white/30">
+
+                            <p class="text-accent font-bold text-lg">
+                                {{ $partner->username }}
+                            </p>
+
+                            <p class="text-xs text-white/70 truncate">
+                                {{ $lastMessage->message }}
+                            </p>
                         </button>
                     @endforeach
                 @endif
+
             </div>
         </div>
         @if ($current_messages && $current_messages->isNotEmpty())
@@ -49,7 +71,8 @@
                 <div class=" flex gap-2">
                     <input wire:model="input_message" value="{{ $input_message }}" wire:keydown.enter="sent_message"
                         type="text" class="w-full bg-white/10 py-1 px-2 focus:outline-0 rounded text-ellipsis">
-                    <button wire:click="sent_message" class="w-fit py-1 px-2 bg-accent/30 rounded hover:bg-accent/50 ">Sent</button>
+                    <button wire:click="sent_message"
+                        class="w-fit py-1 px-2 bg-accent/30 rounded hover:bg-accent/50 ">Sent</button>
                 </div>
             </div>
         @endif

@@ -20,11 +20,10 @@
                     @foreach ($chats as $partnerId => $messages)
                         @php
                             // Ambil pesan terakhir untuk preview
-                            $lastMessage = $messages->last();
+                            $lastMessage = $messages->sortByDesc('created_at')->first();
                             // Tentukan user lawan bicara (bisa sender atau receiver)
                             $partner =
                                 $lastMessage->sender_id == Auth::id() ? $lastMessage->receiver : $lastMessage->sender;
-
                             
                         @endphp
 

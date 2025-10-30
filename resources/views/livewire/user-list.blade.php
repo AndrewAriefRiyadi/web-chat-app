@@ -2,13 +2,24 @@
     <div class=" flex  min-h-92 gap-2  ">
         <div class=" h-full w-52 min-w-52 max-w-52 p-1 min-h-92  ">
             <div class=" flex flex-col gap-2 mb-2 w-full">
-                <p class=" text-xl">Chats</p>
+                <div class=" flex items-center text-center justify-center">
+                    <p class=" text-xl">Chats</p>
+                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                        viewBox="0 0 24 24">
+                        <path fill-rule="evenodd"
+                            d="M3 5.983C3 4.888 3.895 4 5 4h14c1.105 0 2 .888 2 1.983v8.923a1.992 1.992 0 0 1-2 1.983h-6.6l-2.867 2.7c-.955.899-2.533.228-2.533-1.08v-1.62H5c-1.105 0-2-.888-2-1.983V5.983Zm5.706 3.809a1 1 0 1 0-1.412 1.417 1 1 0 1 0 1.412-1.417Zm2.585.002a1 1 0 1 1 .003 1.414 1 1 0 0 1-.003-1.414Zm5.415-.002a1 1 0 1 0-1.412 1.417 1 1 0 1 0 1.412-1.417Z"
+                            clip-rule="evenodd" />
+                    </svg>
+
+                </div>
+                
                 <input wire:model.live="search" type="text" placeholder="username.."
                     class=" bg-white/10 p-2   text-xs rounded placeholder:text-white/50 focus:outline-2 outline-1 outline-white/30 ">
-                @if ($chats->isEmpty())
+                @if ($chats->isEmpty() || $search)
                     <button wire:click="start_new_chat"
                         class=" bg-accent/30 text-xs px-1  rounded py-2 hover:bg-accent/50 focus:outline focus:outline-white/30">Start
-                        new chat</button>
+                        new chat with "{{$search}}"</button>
                 @endif
                 @if ($error_message)
                     <p class=" text-xs text-red-500">{{ $error_message }}</p>
@@ -37,7 +48,7 @@
                                     {{ $partner->username }}
                                 </p>
                                 @if (in_array($partner->id, $new_messages_notif))
-                                    <p class=" text-accent font-bold text-lg">NEW</p>
+                                    <p class=" text-accent font-bold text-lg">🆕</p>
                                 @endif
                             </div>
 

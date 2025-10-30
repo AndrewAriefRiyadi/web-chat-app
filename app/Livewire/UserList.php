@@ -16,6 +16,7 @@ class UserList extends Component
     public $current_messages = [];
 
     public $error_message = '';
+    public $error_sended = false;
 
     public $input_message = '';
 
@@ -123,19 +124,36 @@ class UserList extends Component
     public function render()
     {
         $userId = $this->userId;
+        if ($this->error_message && $this->error_sended) {
+            $this->reset('error_message');
+            $this->reset('error_sended');
+        }
+
+        if ($this->error_message && !$this->error_sended) {
+            $this->error_sended = true;
+        }
+
         return view('livewire.user-list', [
             'chats' => Message::with(['sender', 'receiver'])
                 ->where(function ($q) use ($userId) {
                     $q->where('receiver_id', $userId)
                         ->orWhere('sender_id', $userId);
                 })
-                ->when($this->search, function ($q) {
-                    $q->whereHas('sender', fn($q) => $q->where('username', 'like', "%{$this->search}%"))
-                        ->orWhereHas('receiver', fn($q) => $q->where('username', 'like', "%{$this->search}%"));
+                ->when($this->search, function ($q) use ($userId) {
+                    $q->where(function ($sub) use ($userId) {
+                        $sub->whereHas('sender', fn($q) => $q->where('username', 'like', "%{$this->search}%"))
+                            ->where('receiver_id', $userId);
+                    })
+                        ->orWhere(function ($sub) use ($userId) {
+                            $sub->whereHas('receiver', fn($q) => $q->where('username', 'like', "%{$this->search}%"))
+                                ->where('sender_id', $userId);
+                        });
                 })
+
                 ->orderByDesc('created_at')
                 ->get()
                 ->groupBy(fn($msg) => $msg->sender_id == $userId ? $msg->receiver_id : $msg->sender_id),
         ]);
     }
 }
+// ->orWhereHas('receiver', fn($q) => $q->where('username', 'like', "%{$this->search}%"));

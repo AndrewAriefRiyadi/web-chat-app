@@ -11,4 +11,9 @@ class HomeController extends Controller
         $user = Auth::user();
         return view('home')->with(compact(['user']));
     }
+
+    public function logout(){
+        Auth::logout();
+        return redirect()->route('login');
+    }
 }

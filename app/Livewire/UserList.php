@@ -21,10 +21,15 @@ class UserList extends Component
 
     public $current_partner_id = '';
 
+    public $userId;
+
+    public $new_messages_notif = []; //sender->id yang masuk pesan baru
+
 
     public function mount()
     {
         $this->reset('current_messages');
+        $this->userId = Auth::id();
     }
 
     public function start_new_chat()
@@ -42,7 +47,7 @@ class UserList extends Component
         }
 
         Message::create([
-            'sender_id' => Auth::id(),
+            'sender_id' => $this->userId,
             'receiver_id' => $user->id,
             'message' => 'Halo',
         ]);
@@ -58,7 +63,7 @@ class UserList extends Component
         }
 
         $new_message = Message::create([
-            'sender_id' => Auth::id(),
+            'sender_id' => $this->userId,
             'receiver_id' => $this->current_partner_id,
             'message' => $this->input_message,
         ])->load('sender');
@@ -68,18 +73,23 @@ class UserList extends Component
         broadcast(new MessageSent($new_message))->toOthers();
 
     }
-    #[On('echo:chat,MessageSent')]
+    #[On('echo-private:chat.{userId},MessageSent')]
     public function message_received($data)
     {
         $message = $data['message'];
-        if ($message['receiver_id'] != Auth::id()) {
+        if ($message['receiver_id'] != $this->userId) {
             return;
         }
 
         if ($this->current_partner_id == $message['sender_id']) {
             $new_message = Message::find($message['id']);
             $this->current_messages->push($new_message);
+            return;
         }
+        if (in_array($message['sender_id'], $this->new_messages_notif)) {
+            return;
+        }
+        array_push($this->new_messages_notif, $message['sender_id']);
     }
 
     public function show_chat($sender_id)
@@ -89,15 +99,20 @@ class UserList extends Component
         $this->current_partner_id = $sender_id;
         $this->reset('current_messages');
 
+        $key = array_search($sender_id, $this->new_messages_notif); // Find the key of the first occurrence
+        if ($key !== false) {
+            unset($this->new_messages_notif[$key]); // Remove the element at the found key
+        }
+
         $this->current_messages = Message::with('sender')
             ->where(function ($q) use ($sender_id) {
                 // Pesan yang dikirim ke user login
-                $q->where('receiver_id', Auth::id())
+                $q->where('receiver_id', $this->userId)
                     ->where('sender_id', $sender_id);
             })
             ->orWhere(function ($q) use ($sender_id) {
                 // Pesan yang dikirim oleh user login
-                $q->where('sender_id', Auth::id())
+                $q->where('sender_id', $this->userId)
                     ->where('receiver_id', $sender_id);
             })
             ->get()
@@ -107,7 +122,7 @@ class UserList extends Component
 
     public function render()
     {
-        $userId = Auth::id();
+        $userId = $this->userId;
         return view('livewire.user-list', [
             'chats' => Message::with(['sender', 'receiver'])
                 ->where(function ($q) use ($userId) {

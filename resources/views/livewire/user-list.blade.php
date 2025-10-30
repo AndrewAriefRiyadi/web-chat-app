@@ -24,7 +24,7 @@
                             // Tentukan user lawan bicara (bisa sender atau receiver)
                             $partner =
                                 $lastMessage->sender_id == Auth::id() ? $lastMessage->receiver : $lastMessage->sender;
-                            
+
                         @endphp
 
                         <button type="button" wire:click="show_chat({{ $partner->id }})"
@@ -32,14 +32,21 @@
                                     transition transform hover:translate-x-1 
                                     focus:translate-x-1.5 focus:bg-secondary/30 
                                     focus:outline-2 focus:outline-white/30">
+                            <div class=" flex justify-between">
+                                <p class="text-accent font-bold text-lg">
+                                    {{ $partner->username }}
+                                </p>
+                                @if (in_array($partner->id, $new_messages_notif))
+                                    <p class=" text-accent font-bold text-lg">NEW</p>
+                                @endif
+                            </div>
 
-                            <p class="text-accent font-bold text-lg">
-                                {{ $partner->username }}
-                            </p>
 
                             <p class="text-xs text-white/70 truncate">
                                 {{ $lastMessage->message }}
                             </p>
+
+
                         </button>
                     @endforeach
                 @endif

@@ -8,4 +8,4 @@ use App\Livewire\Register;
 Route::get('/', Login::class)->name('login')->middleware('guest');
 Route::get('/register', Register::class)->name('register')->middleware('guest');
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
-
+Route::get('/logout', [HomeController::class, 'logout'])->name('logout')->middleware('auth');

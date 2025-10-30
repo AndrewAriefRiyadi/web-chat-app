@@ -3,7 +3,7 @@
 @section('content')
     <div class=" flex justify-between mb-4">
         <p>Welcome {{$user->username}}</p>
-        <a href="#">Logout</a>
+        <a href="{{route('logout')}}">Logout</a>
     </div>
     <livewire:user-list/>
 @endsection

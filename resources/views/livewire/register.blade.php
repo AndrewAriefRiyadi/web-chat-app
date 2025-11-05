@@ -1,5 +1,5 @@
-<form wire:submit="save" class=" flex flex-col gap-2 ">
-    <div class=" flex flex-col gap-2">
+<form wire:submit="save" class=" flex flex-col justify-center text-center gap-2 ">
+    <div class=" flex flex-col gap-2 text-start">
         <div class="text-center w-full">
             <p>Register to Garis</p>
         </div>
@@ -19,5 +19,5 @@
         </div>
     </div>
     <button type="submit" class=" bg-primary p-2 h-fit transition hover:bg-secondary ">Submit</button>
-
+    <p>Already have an account? <a href="{{route('login')}}" class=" underline text-accent">Login</a></p>
 </form>

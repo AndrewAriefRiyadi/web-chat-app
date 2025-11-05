@@ -16,14 +16,11 @@
 <body data-theme="forest"
     class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-white flex p-6 lg:p-8 items-center justify-center min-h-screen flex-col font-mono">
 
-    <div class="flex flex-col items-center justify-center w-full transition-opacity opacity-100 duration-750  starting:opacity-0 h-full relative">
+    <div class="flex flex-col items-center justify-center w-full transition-opacity opacity-100 duration-750  starting:opacity-0 h-full ">
 
-        <!-- 🔔 Notification bar -->
-        <div class="absolute top-0 right- w-full lg:max-w-4xl p-4 bg-primary text-white text-center shadow-lg z-50">
-            <p>🔔 Notification</p>
-        </div>
 
-        <main class="flex w-full flex-col-reverse lg:max-w-4xl h-full mt-16">
+        <main class="flex w-full flex-col-reverse lg:max-w-4xl h-full mt-16 relative">
+            <livewire:notifications/>
             <div class="flex flex-col bg-white/10 w-full p-8 rounded-2xl h-full">
                 @yield('content')
             </div>

@@ -81,12 +81,14 @@ class UserList extends Component
         if ($message['receiver_id'] != $this->userId) {
             return;
         }
-
+        # Jika chatnya lagi dibuka, push pesan terbaru
         if ($this->current_partner_id == $message['sender_id']) {
             $new_message = Message::find($message['id']);
             $this->current_messages->push($new_message);
             return;
         }
+
+        # Kasih logo new message di chat lists
         if (in_array($message['sender_id'], $this->new_messages_notif)) {
             return;
         }
